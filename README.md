@@ -4,6 +4,13 @@
 
 通过安装本技能包，您的 AI Agent 将掌握严格的学术排版规范、逻辑论证框架以及专业的学术词汇库，从而输出达到发表级标准的内容。
 
+## 极简体验
+
+复制技能的原文件到您常用的 AI 对话框中即可：
+
+- [中文学术写作 academic-writing-zh/SKILL.md](./academic-writing-zh/SKILL.md)
+- [中文科研绘图 academic-figure-zh/SKILL.md](./academic-figure-zh/SKILL.md)
+
 ## 包含技能
 
 本仓库包含以下两个独立技能：
@@ -72,15 +79,6 @@ npx skills add your-username/your-repo-name --skill academic-figure-zh
 - 调用全局颜色字典：主方法 `#1D4ED8`，基线 `#DC2626`。
 - 设置字体为 Times New Roman，字号为 9pt。
 - 隐藏图表的上边框和右边框，保留左边框和下边框。
-
----
-
-## 技能详细规范
-
-如果您想了解具体的规则细节，可以查看各技能的源文件：
-
-- [academic-writing-zh/SKILL.md](./academic-writing-zh/SKILL.md)
-- [academic-figure-zh/SKILL.md](./academic-figure-zh/SKILL.md)
 
 ## 贡献与反馈
 
