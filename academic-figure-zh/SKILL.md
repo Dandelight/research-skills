@@ -1,17 +1,30 @@
 ---
 name: academic-figure-zh
-description: Use this skill when user are plotting academic figures, including data figures, framework figures and theory figures
+description: Use this skill when user are plotting academic figures, including data figures, framework figures and theory figures. Optimized for Chinese academic thesis (CNKI/GB standards) and international conferences.
 ---
 
 ## 一、总原则
 
 ### 1. 尺寸即语义（Size is Semantics）
 
-**所有图必须在生成阶段即定稿尺寸，禁止后期缩放。** LaTeX 中应使用 `width=\linewidth` 插入，而非 `scale=0.5`。
+**所有图必须在生成阶段即定稿尺寸，禁止后期缩放。** LaTeX/Word 中应使用原始尺寸插入，禁止拖拽缩放。
 
-- **单栏**：3.5" × 2.2"（约 8.9cm × 5.6cm）
-- **双栏**：7.0" × 2.5"（约 17.8cm × 6.4cm）
+**单位换算基准**（必须牢记）：
+- 1 inch = 2.54 cm = 72 pt
+- 1 cm = 28.35 pt (近似)
+- px = inch × dpi (通常300dpi印刷)
+
+**中文论文常用尺寸**：
+- **单栏图**：8.5 cm × 5.5 cm (≈3.35" × 2.17")，适用双栏排版中的单栏插图
+- **双栏图/大图**：13.5 cm × 9.0 cm (≈5.31" × 3.54")，适用通栏大图；或 17.0 cm × 6.5 cm (≈6.69" × 2.56")，A4全宽
 - **比例**：推荐 1.618:1 或 3:2，允许 1:1（仅用于矩阵/热图）
+
+**字号层级体系**（以中文小四正文12pt为基准）：
+- **正文**：小四 (12pt)
+- **图注 (Caption)**：五号 (10.5pt)，宋体/黑体，比正文小半级
+- **图中轴标签**：小五 (9pt)，比正文小1.3倍（$\sqrt{2}$缩放）
+- **图中刻度/图例**：小五/六号 (8-9pt)，辅助信息，可降至8pt
+- **英文同级**：比中文小1pt（如中文9pt，英文8pt），英文视觉显大
 
 ### 2. 颜色是语义绑定（Color is Encoding）
 
@@ -40,12 +53,19 @@ description: Use this skill when user are plotting academic figures, including d
 
 整篇论文视为一个"视觉 API"：相同语义必须使用相同**颜色、线型、图元、字体**。禁止随图更换配色逻辑。
 
+**中英文混排规范**：
+- **字体配对**：中文宋体(SimSun) ↔ 英文 Times New Roman；中文黑体(SimHei) ↔ 英文 Arial
+- **字号补偿**：英文同级比中文小1pt（如中文9pt，英文8pt）
+- **负号处理**：`matplotlib` 必须解决 ASCII 负号显示问题（`axes.unicode_minus = False`）
+
 ## 二、数据图规范（Line / Bar / Scatter）
 
 ### 画布与导出
 
-- **程序化生成**：使用 Matplotlib 按最终尺寸作图，figsize=(3.5, 2.2)，dpi=300，导出 PDF（嵌入字体）
-- **禁止缩放**：LaTeX 中 `\includegraphics[width=\linewidth]{fig.pdf}`，不得使用 `scale` 或 `height` 调整
+- **程序化生成**：使用 Matplotlib 按最终尺寸作图，物理尺寸严格等于印刷尺寸
+- **中文大图示例**：13.5cm × 9.0cm → `figsize=(13.5/2.54, 9/2.54)` inch
+- **DPI 设定**：导出 300dpi（印刷最低标准），600dpi（高清），矢量PDF（无限缩放）
+- **禁止缩放**：Word/LaTeX 中插入时选择「原始大小」或 `width=\linewidth`（仅当 figsize 精确匹配栏宽时）
 
 ### 线型与标记
 
@@ -56,13 +76,40 @@ description: Use this skill when user are plotting academic figures, including d
 ### 坐标轴与文字
 
 - **Spine**：仅保留 left/bottom，linewidth=0.8，color=`#334155`；top/right 必须删除
-- **字体**：英文论文使用 Times New Roman，`font.size=9pt`（轴标签），`labelsize=8pt`（刻度）
+- **字体配置**（中文论文场景）：
+  ```python
+  plt.rcParams.update({
+      'font.sans-serif': ['SimSun', 'Times New Roman'],  # 宋体+Times
+      'axes.unicode_minus': False,  # 解决负号显示为方块
+      'font.size': 9,        # 小五9pt（图中基准，比正文12pt小）
+      'axes.titlesize': 9,   # 图内标题（通常不用）
+      'axes.labelsize': 9,   # 轴标签小五9pt
+      'xtick.labelsize': 8,  # 刻度8pt（比标签小一级）
+      'ytick.labelsize': 8,
+      'legend.fontsize': 9,    # 图例9pt
+  })
+  ```
 - **柱状图**：Y 轴必须从 0 开始；折线图可裁剪但需明确标注断点
-- **图例**：`frameon=False`，`fontsize=8pt`，位置优先右上或图外右侧
+- **图例**：`frameon=False`，`fontsize=8-9pt`，位置优先右上或图外右侧
 
 ### 可退化性（Grayscale Safety）
 
 必须同时通过**线型 + marker** 区分类别，确保转灰度后所有曲线仍可辨识。
+
+### 位图例外（高密度场景）
+
+当图中独立对象数量超过 **200 个**（如密集散点、网络节点、栅格热力图），或包含影像数据时，**强制使用高清位图**替代矢量PDF：
+
+- **分辨率**：600dpi（确保8pt文字边缘无锯齿）
+- **格式**：PNG（无损压缩）或 TIFF（LZW），禁用JPEG（除非仅包含自然照片）
+- **尺寸锁定**：像素必须严格匹配物理尺寸（px = cm/2.54 × 600），插入时禁止缩放
+- **文件大小控制**：PNG使用压缩级别9，目标<2MB；超过则检查是否包含不必要的透明通道或图层
+
+**混合策略**：若图中既有复杂栅格（如热力图）又有简单矢量元素（如坐标轴），可分层导出：
+- 热力图 → 600dpi PNG位图
+- 坐标轴/标签 → 矢量PDF叠加（LaTeX overlay 或 Illustrator合成）
+
+这样既保证复杂区域的渲染效率，又确保文字和轴线的无限缩放清晰度。
 
 ## 三、框架图规范（Architecture / Pipeline）
 
@@ -100,90 +147,33 @@ description: Use this skill when user are plotting academic figures, including d
 - **空间即语义**：左侧=原始/噪声数据，右侧=学习后结构，水平移动表示算法作用过程
 - **禁止**：节点大小不一致（除非表达权重）、同一图中混合多种几何形状（圆/方/三角随意混用）
 
-## 五、检查清单（Pre-submission）
+## 五、中文排版特殊规范
+
+### 单位换算速查（13.5cm × 9cm 示例）
+```python
+cm = 1/2.54  # 厘米转英寸
+fig = plt.figure(figsize=(13.5*cm, 9.0*cm))  # (5.315, 3.543) inch
+
+# 对应像素尺寸
+# @300dpi: 1594 px × 1063 px
+# @600dpi: 3189 px × 2126 px
+```
+
+### 字体嵌入与导出
+- **PDF 导出**：必须设置 `pdf.fonttype = 42`（TrueType嵌入），防止印刷时字体缺失
+- **中文字体**：优先使用 SimSun（宋体，衬线）或 SimHei（黑体，非衬线），避免使用系统默认字体
+- **负号修复**：`plt.rcParams['axes.unicode_minus'] = False` 防止负号显示为方块
+
+### 字号-正文字号映射表
+| 正文字号 | 图中轴标签 | 图中刻度 | 图注(Caption) |
+|---------|-----------|---------|--------------|
+| 小四(12pt) | 9pt | 8pt | 10.5pt(五号) |
+| 五号(10.5pt) | 9pt | 8pt | 9pt(小五) |
+
+## 六、检查清单（Pre-submission）
 
 1. **打印测试**：转灰度后所有数据线仍可区分，8pt 文字清晰可读，0.5pt 线条不消失
-2. **技术检查**：所有文字为矢量，无隐藏图层，PDF 文件大小 <5MB
-3. **规范检查**：图中无 "Figure 1." 字样（由 LaTeX 生成），所有轴标签带单位，无孤悬数据点
-
-这套规范的核心不是"如何画一张好看的图"，而是建立**跨论文统一的视觉语言**，使 reviewer 在 3 秒内识别你的方法、理解机制、相信结果。
-
-你提到的「不指定宽度」**在技术上确实可行，但有严格前提**；而 `width=\linewidth` 的「不靠谱」往往源于**作图尺寸没对齐**，而非命令本身的问题。
-
-## 关于图片尺寸的特殊说明
-
-通常是因为：
-
-1. **作图尺寸 ≠ 栏宽**：你在 Python 里画了个 `figsize=(8, 6)` 的大图，塞进单栏时 `width=\linewidth` 会把 8 英寸压到 3.5 英寸，**字体跟着缩水到 4pt**，直接废掉
-2. **双栏/单栏混用混乱**：`\linewidth` 在 `figure` 环境（单栏）和 `figure*` 环境（跨栏）中值不同，如果放错环境会缩放异常
-
-**结论**：问题不在 LaTeX 命令，而在**作图时没按 final-size 绘制**。
-
-## 二、「不指定宽度」的可行性（你说的方案）
-
-如果你严格遵循 **Final-Size Plotting**（画布尺寸 = 印刷尺寸）：
-
-- 单栏图：Python 里 `figsize=(3.5, 2.2)`（inch）
-- 双栏图：Python 里 `figsize=(7.0, 2.5)`
-
-那么在 LaTeX 中确实可以：
-
-```latex
-\includegraphics{fig.pdf}  % 不指定任何宽度，按自然尺寸渲染
-```
-
-**效果**：图会以其固有尺寸（3.5" 或 7"）插入，恰好填满栏宽，**无任何缩放，字体保持 9pt**。
-
-### ⚠️ 但此方案有两个隐患：
-
-1. **环境误放风险**：如果把单栏图（3.5"）误放进 `figure*`（双栏环境），不指定宽度会导致图只占双栏的左半边，另一半空白，排版崩坏
-2. **微调失效**：当栏宽因模板调整（如调整页边距）而轻微变化时，无法自动适应
-
-## 三、更稳妥的「保险丝」方案
-
-既然你担心缩放，又要保证安全，推荐**组合策略**：
-
-### 方案 A：强制自然尺寸（推荐）
-
-作图时锁定尺寸，LaTeX 中禁止缩放：
-
-```latex
-\includegraphics[width=\linewidth]{fig.pdf}  % 保持，但前提：figsize 必须精确等于栏宽
-```
-
-**前提检查**：`figsize=(3.5, ...)` 必须精确等于 `\linewidth`（3.5"），这样 `width=\linewidth` 实际缩放比为 1.0，等于没缩。
-
-### 方案 B：物理尺寸硬编码（最保险）
-
-直接在 Python 里按物理 cm/inch 作图，LaTeX 里不管栏宽：
-
-```python
-# 精确按单栏 8.9cm 作图
-fig, ax = plt.subplots(figsize=(8.9/2.54, 5.6/2.54))  # inch = cm/2.54
-```
-
-然后 LaTeX 中：
-
-```latex
-\includegraphics{fig.pdf}  % 不指定宽度，物理尺寸就是 8.9cm，天然 fit
-```
-
-### 方案 C：双重保险（应对模板变化）
-
-如果你担心投不同会议（CVPR vs ICML 栏宽不同），用 **keepaspectratio + 最大宽度限制**：
-
-```latex
-\includegraphics[width=\linewidth,keepaspectratio]{fig.pdf}
-```
-
-但这仍有缩放风险，**不如直接做两个版本**：`fig_single.pdf`（3.5"）和 `fig_double.pdf`（7"）。
-
-## 四、最终建议（ Constitutional 级别）
-
-**黄金法则**：**缩放是敌人，物理对齐是朋友**
-
-1. **作图阶段**：Matplotlib 的 `figsize` 必须**物理上等于**目标栏宽（单栏 3.5" / 双栏 7.0"），不要用默认的 (6.4, 4.8)
-2. **LaTeX 阶段**：**保留 `width=\linewidth`**，它是保险丝而非缩放指令——当且仅当你的 figsize 正确时，它的缩放倍率为 1.0，等于无缩放；万一 figsize 有误，它能防止图爆框
-3. **绝不使用**：`scale=0.5`、`height=5cm`、`width=0.8\linewidth` 这类模糊缩放——这是破坏字体的元凶
-
-如果你非常确定 figsize 精确无误，用 `\includegraphics{fig.pdf}`（不指定宽度）确实更纯粹。但为防手滑，建议保留 `width=\linewidth` 作为**断言检查**（assertion）：如果插入后发现字体被压缩，立即回溯修正 Python 代码，而不是在 LaTeX 里调宽度妥协。
+2. **技术检查**：所有文字为矢量，无隐藏图层，PDF 文件大小 <5MB，字体已嵌入（检查PDF属性）
+3. **规范检查**：图中无 "Figure 1." 字样（由 LaTeX/Word 生成），所有轴标签带单位，无孤悬数据点
+4. **中文专项**：无乱码（特别是负号、度符号°、希腊字母），中英文混排字号协调（英文比中文小1pt）
+5. **尺寸验证**：PDF插入Word后显示尺寸精确等于 figsize 设定（13.5cm×9cm不得有偏差）
