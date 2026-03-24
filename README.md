@@ -1,6 +1,6 @@
-# Academic Skills (Chinese) / 中文学术写作与绘图技能包
+# Academic Skills (Chinese) / 中文文献调研、学术写作与绘图技能包
 
-这是一组专为 AI Agent 设计的技能包，旨在提升 Agent 在**中文学术写作**与**学术图表绘制**方面的专业性与规范性。
+这是一组专为 AI Agent 设计的技能包，旨在提升 Agent 在**arXiv文献跟踪**，**中文学术写作**与**学术图表绘制**方面的专业性与规范性。
 
 通过安装本技能包，您的 AI Agent 将掌握严格的学术排版规范、逻辑论证框架以及专业的学术词汇库，从而输出达到发表级标准的内容。
 
@@ -10,10 +10,11 @@
 
 - [中文学术写作 academic-writing-zh/SKILL.md](./academic-writing-zh/SKILL.md)
 - [中文科研绘图 academic-figure-zh/SKILL.md](./academic-figure-zh/SKILL.md)
+- [arXiv 视觉冲刺 arxiv-visual-sprint/SKILL.md](./arxiv-visual-sprint/SKILL.md)
 
 ## 包含技能
 
-本仓库包含以下两个独立技能：
+本仓库包含以下三个独立技能：
 
 ### 1. `academic-writing-zh` - 中文学术写作助手
 
@@ -35,6 +36,17 @@
 - **视觉层级压制**：通过线宽、颜色饱和度建立清晰的信息层级，引导读者视线。
 - **跨平台规范**：包含 Matplotlib 参数设置、LaTeX 插入最佳实践以及灰度安全检查清单。
 
+### 3. `arxiv-visual-sprint` - 近一周论文冲刺与可视化摘要
+
+**核心能力**：围绕用户选题自动发散关键词，筛选最近 7 天 arXiv 论文，按类别组织结果，并生成可直接交付的 PNG Visual Abstract。
+
+**主要特性**：
+- **时效优先检索**：自动聚焦近 7 天新论文，避免历史噪声干扰。
+- **分类化浏览**：将候选论文按技术子类聚合，降低“20 篇平铺”阅读负担。
+- **SSE 生图链路**：默认走 `streamGenerateContent?alt=sse`，支持重试与超时配置。
+- **代理与模型适配**：支持可选 `GEMINI_API_BASE`，可自动识别 cherryin 模型名。
+- **交付路径友好**：生成脚本会输出图片文件绝对路径，方便直接定位文件。
+
 ---
 
 ## 安装方法
@@ -45,7 +57,7 @@
 npx skills add Dandelight/research-skills
 ```
 
-这将同时安装 `academic-writing-zh` 和 `academic-figure-zh` 两个技能。
+这将同时安装 `academic-writing-zh`、`academic-figure-zh` 和 `arxiv-visual-sprint` 三个技能。
 
 或者您可以只安装单个 Skill：
 
@@ -55,6 +67,9 @@ npx skills add Dandelight/research-skills --skill academic-writing-zh
 
 # 只安装「学术图表规范」技能
 npx skills add Dandelight/research-skills --skill academic-figure-zh
+
+# 只安装「arXiv 视觉冲刺」技能
+npx skills add Dandelight/research-skills --skill arxiv-visual-sprint
 ```
 
 如果您未安装 Node.js 或 Skills CLI，您可以直接从 GitHub 仓库下载技能文件，放到您的 AI Agent 配置目录下，一般为全局的 `~/.skills/` 或者项目的 `skills/` 目录。配置之后应该目录结构如下：
@@ -63,7 +78,9 @@ npx skills add Dandelight/research-skills --skill academic-figure-zh
 skills/
 ├── academic-writing-zh/
 │   └── SKILL.md
-└── academic-figure-zh/
+├── academic-figure-zh/
+│   └── SKILL.md
+└── arxiv-visual-sprint/
     └── SKILL.md
 ```
 
@@ -89,6 +106,51 @@ skills/
 - 调用全局颜色字典：主方法 `#1D4ED8`，基线 `#DC2626`。
 - 设置字体为 Times New Roman，字号为 9pt。
 - 隐藏图表的上边框和右边框，保留左边框和下边框。
+
+### 场景三：快速文献冲刺（自动激活 `arxiv-visual-sprint`）
+
+**用户输入**：
+> “帮我筛选最近一周 multi-agent 的新论文，按类别整理一下，并给我生成一个 visual abstract。”
+
+**Agent 行为（应用技能后）**：
+- 自动发散 3-5 个检索关键词并聚合最近 7 天论文。
+- 默认展示前 20 篇并按技术子类分组，主动引导用户选择类别或论文编号。
+- 基于论文前 5 页内容生成 PNG Visual Abstract（默认 SSE 模式）。
+- 输出生成文件的绝对路径，便于用户直接打开或分享。
+
+## 常见报错排查（arxiv-visual-sprint）
+
+使用 `arxiv-visual-sprint` 前，至少需要设置 `GEMINI_API_KEY`。`GEMINI_API_BASE` 是可选项：直连官方时可不设置，走中转或第三方网关时建议设置。
+
+我在用的中转服务商：[CherryIN](https://open.cherryin.ai/register?aff=Z26d)
+
+### 1) 必备环境变量
+
+```bash
+GEMINI_API_KEY=你的密钥
+GEMINI_API_BASE=你的网关地址（可选）
+```
+
+### 2) macOS / Linux 设置示例
+
+```bash
+export GEMINI_API_KEY="your_api_key"
+export GEMINI_API_BASE="https://your-api-base.example.com"
+```
+
+### 3) Windows PowerShell 设置示例
+
+```powershell
+$env:GEMINI_API_KEY="your_api_key"
+$env:GEMINI_API_BASE="https://your-api-base.example.com"
+```
+
+### 4) 常见错误与处理
+
+- `GEMINI_API_KEY not found`：未设置 API Key，先设置后再运行。
+- `Operation timed out`：优先检查 `GEMINI_API_BASE` 可达性，随后提高 `--timeout-seconds` 并配合 `--retries`。
+- 返回 401/403：检查 Key 是否有效、额度是否充足、网关权限是否包含图像模型。
+- cherryin 模式下模型名建议使用 `google/gemini-3.1-flash-image-preview`（也可通过 `GEMINI_MODEL` 显式覆盖）。
 
 ## 贡献与反馈
 
