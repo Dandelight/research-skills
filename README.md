@@ -39,7 +39,7 @@
 
 ## 安装方法
 
-确保您已经安装了 [Skills CLI](https://skills.sh)。然后在终端运行以下命令：
+若您已经安装了 [Node.js](https://nodejs.org/)，即可通过 [Skills CLI](https://skills.sh) 安装和管理 Skills。在终端运行以下命令：
 
 ```bash
 npx skills add Dandelight/research-skills
@@ -55,6 +55,16 @@ npx skills add Dandelight/research-skills --skill academic-writing-zh
 
 # 只安装「学术图表规范」技能
 npx skills add Dandelight/research-skills --skill academic-figure-zh
+```
+
+如果您未安装 Node.js 或 Skills CLI，您可以直接从 GitHub 仓库下载技能文件，放到您的 AI Agent 配置目录下，一般为全局的 `~/.skills/` 或者项目的 `skills/` 目录。配置之后应该目录结构如下：
+
+```
+skills/
+├── academic-writing-zh/
+│   └── SKILL.md
+└── academic-figure-zh/
+    └── SKILL.md
 ```
 
 ## 使用示例
