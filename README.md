@@ -51,10 +51,10 @@ npx skills add Dandelight/research-skills
 
 ```bash
 # 只安装「学术写作规范」技能
-npx skills add your-username/your-repo-name --skill academic-writing-zh
+npx skills add Dandelight/research-skills --skill academic-writing-zh
 
 # 只安装「学术图表规范」技能
-npx skills add your-username/your-repo-name --skill academic-figure-zh
+npx skills add Dandelight/research-skills --skill academic-figure-zh
 ```
 
 ## 使用示例
