@@ -33,7 +33,7 @@ description: "45-min arXiv Visual Sprint: Auto-expands topics, filters last 7 da
 - **环境变量缺失**：如果脚本报错“GEMINI_API_KEY not found”，**必须**告知用户先设置 API Key；若使用代理且报连接问题，再引导设置 `GEMINI_API_BASE`。
 - **新手引导**：如果用户不了解“环境变量”概念，**必须**引导其参考 [REFERENCE.md#环境变量设置指南](./REFERENCE.md#环境变量设置指南)，并根据其操作系统（Windows/macOS/Linux）提供可直接复制的命令。
 - **超时排查**：如果出现 `Operation timed out`，**必须**先检查 `GEMINI_API_BASE` 是否可达，再提高 `--timeout-seconds` 并使用 `--retries` 重试，同时保留脚本日志定位卡点。
-- [ ] 工作目录 `./workspace/sprints/` 可写
+- [ ] 确保在本项目根目录下创建存放所有生成文件的工作目录，该目录应当**可写**，绝对路径为：`/Users/dandelight/workspace/github.com/Dandelight/research-skills/workspace/{datetime}-{topic}/`
 
 ## 执行检查清单
 
@@ -61,17 +61,20 @@ description: "45-min arXiv Visual Sprint: Auto-expands topics, filters last 7 da
 - [ ] **必须**调用 `uv run scripts/generate_visual_abstract.py` 脚本生成 PNG 图片。
 - [ ] **必须**优先使用 PDF 直连模式：`--pdf <path> --pdf-pages 5`，直接提取前 5 页文本送入 Gemini。
 - [ ] **必须**符合官方规范：`aspectRatio: "3:2"`, `imageSize: "1K"`。
-- [ ] **必须**保存到 `./workspace/sprints/{date}-{keyword}/visuals/{paper_id}_abstract.png`。
+- [ ] **必须**保存图片及提取的 JSON 文件至绝对路径：`/Users/dandelight/workspace/github.com/Dandelight/research-skills/workspace/{datetime}-{topic}/visuals/{paper_id}_abstract.png`，所有生成的中间 JSON 等文件一律放在该 workspace 对应目录下以免找不到。
 - [ ] **checkpoint**: 使用 `uv run scripts/validate_image.py` 自动验证图像合规性；如失败需保留完整日志并提示用户如何设置环境变量。
 
 ### Phase 4: 交付与汇总（5分钟）
-- [ ] **必须**生成 `index.html` 汇总页，包含 3 个 Visual Abstract 卡片。
-- [ ] **必须**输出最终路径：`./workspace/sprints/{date}-{keyword}/index.html`
+- [ ] **必须**直接生成 Markdown 格式的 `summary.md` 汇总页，包含 3 个 Visual Abstract 卡片及相关信息，**不要生成 HTML**。
+- [ ] **必须**输出最终的绝对路径：`/Users/dandelight/workspace/github.com/Dandelight/research-skills/workspace/{datetime}-{topic}/summary.md`
 
 ## 禁止事项（ANTI-PATTERNS）
 - **禁止**搜索全量历史论文（必须限定为近一周，确保“冲刺”的时效性）。
 - **禁止**跳过选题发散步骤（直接搜选题往往噪音太大）。
 - **禁止**下载 PDF 全文（仅前 5 页）。
+- **禁止**通过临时新增脚本文件的方式来执行任务。
+- **禁止**使用 `python -c` 或其他内联脚本来执行命令。
+- **强制**如果发现现有脚本缺失完成任务所需的功能，**必须**直接告知用户该 Skill 缺失什么功能并停止执行，而不是试图通过变通方法强行执行。这是为了满足封装原则，让结果更加可控。
 
 ## 任务示例
 **输入**: "帮我看看最近一周关于大模型长文本处理 (Long Context) 的论文，做个可视化摘要"
@@ -79,8 +82,8 @@ description: "45-min arXiv Visual Sprint: Auto-expands topics, filters last 7 da
 **执行流**:
 1. Gemini 发散关键词: "Long Context Window", "Needle In A Haystack", "Transformer Context Extension"...
 2. 检索近 7 天论文 -> 得到 8 篇 -> 用户选择 3 篇。
-3. 提取前 5 页 -> 生成 JSON -> 生成 3 张 PNG。
-4. 生成 `index.html`。
+3. 提取前 5 页 -> 生成 JSON (存放于绝对路径下) -> 生成 3 张 PNG。
+4. 生成 `summary.md`。
 
 ## 参考文档
 - 详细策略与代码实现: [REFERENCE.md](./REFERENCE.md)
