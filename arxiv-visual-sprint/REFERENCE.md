@@ -59,11 +59,11 @@ prompt = f"""
 **Python 调用方式 (通过 uv run)**:
 ```bash
 uv run scripts/generate_visual_abstract.py \
-    --pdf "./raw/paper.pdf" \
+    --pdf "/Users/dandelight/workspace/github.com/Dandelight/research-skills/workspace/{datetime}-{topic}/raw/paper.pdf" \
     --pdf-pages 5 \
     --retries 3 \
     --timeout-seconds 180 \
-    --output "./visuals/output.png"
+    --output "/Users/dandelight/workspace/github.com/Dandelight/research-skills/workspace/{datetime}-{topic}/visuals/output.png"
 ```
 
 也支持结构化字段模式（不传 PDF）：
@@ -73,7 +73,7 @@ uv run scripts/generate_visual_abstract.py \
     --problem "[问题陈述]" \
     --contributions "[贡献点1, 2, 3]" \
     --method "[方法关键词]" \
-    --output "./visuals/output.png"
+    --output "/Users/dandelight/workspace/github.com/Dandelight/research-skills/workspace/{datetime}-{topic}/visuals/output.png"
 ```
 
 **内部逻辑 (google-genai SDK)**:
@@ -112,7 +112,7 @@ response = client.models.generate_content(
 - **陷阱: 检索结果为空**
   - **解决**: 如果近一周无相关论文，提示用户扩大时间范围至近一月，或更换发散关键词。
 - **陷阱: PDF 解析乱码**
-  - **解决**: 降级为使用 arXiv 原始摘要进行生成，并在 `index.html` 中注明“基于摘要生成”。
+  - **解决**: 降级为使用 arXiv 原始摘要进行生成，并在 `summary.md` 中注明“基于摘要生成”。
 
 ## 5. 环境变量设置指南
 
@@ -177,8 +177,8 @@ export GEMINI_MODEL="google/gemini-3.1-flash-image-preview"
 > ✅ **恭喜！您的 45 分钟科研情报冲刺已圆满完成！**
 >
 > 我已经为您生成了 3 份结构化的 Visual Abstract，并汇总到了以下路径：
-> 📂 `workspace/sprints/{date}-{keyword}/index.html`
+> 📂 `/Users/dandelight/workspace/github.com/Dandelight/research-skills/workspace/{datetime}-{topic}/summary.md`
 >
-> **您可以直接在浏览器中打开此文件查看所有可视化卡片。** 这些摘要基于论文的核心方法论和 Figure 1 进行了深度萃取，希望能为您节省数小时的阅读时间！
+> **您可以直接在编辑器或支持 Markdown 的软件中打开此文件查看所有可视化卡片及结构化信息。** 这些摘要基于论文的核心方法论和 Figure 1 进行了深度萃取，希望能为您节省数小时的阅读时间！
 >
 > 您对这次的 Sprint 结果满意吗？如果有需要调整的地方，请随时告诉我。
