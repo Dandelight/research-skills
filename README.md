@@ -11,6 +11,7 @@
 - [中文学术写作 academic-writing-zh/SKILL.md](./academic-writing-zh/SKILL.md)
 - [中文科研绘图 academic-figure-zh/SKILL.md](./academic-figure-zh/SKILL.md)
 - [arXiv 视觉冲刺 arxiv-visual-sprint/SKILL.md](./arxiv-visual-sprint/SKILL.md)
+- [任务分解与编排 task-decomposition-zh/SKILL.md](./task-decomposition-zh/SKILL.md)
 
 ## 包含技能
 
@@ -70,6 +71,9 @@ npx skills add Dandelight/research-skills --skill academic-figure-zh
 
 # 只安装「arXiv 视觉冲刺」技能
 npx skills add Dandelight/research-skills --skill arxiv-visual-sprint
+
+# 只安装「任务分解与编排」技能
+npx skills add Dandelight/research-skills --skill task-decomposition-zh
 ```
 
 如果您未安装 Node.js 或 Skills CLI，您可以直接从 GitHub 仓库下载技能文件，放到您的 AI Agent 配置目录下，一般为全局的 `~/.skills/` 或者项目的 `skills/` 目录。配置之后应该目录结构如下：
@@ -79,6 +83,8 @@ skills/
 ├── academic-writing-zh/
 │   └── SKILL.md
 ├── academic-figure-zh/
+│   └── SKILL.md
+├── task-decomposition-zh/
 │   └── SKILL.md
 └── arxiv-visual-sprint/
     └── SKILL.md
@@ -117,6 +123,16 @@ skills/
 - 默认展示前 20 篇并按技术子类分组，主动引导用户选择类别或论文编号。
 - 基于论文前 5 页内容生成 PNG Visual Abstract（默认 SSE 模式）。
 - 输出生成文件的绝对路径，便于用户直接打开或分享。
+
+### 场景四：任务分解与编排（自动激活 `task-decomposition-zh`）
+
+**用户输入**：
+> “请帮我分解‘复现一篇论文’的任务”
+
+**Agent 输出（应用技能后）**：
+- 任务分解为多个子任务，每个子任务都有明确的依赖关系和执行顺序。
+- 每个子任务都有一个清晰的输出物，方便后续处理。
+- 任务执行计划（如并行执行、顺序执行等）。
 
 ## 常见报错排查（arxiv-visual-sprint）
 
