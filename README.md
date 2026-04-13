@@ -1,4 +1,4 @@
-# Academic Skills (Chinese) / 中文文献调研、学术写作与绘图技能包
+<center><h1>研究生.skill</h1></center>
 
 这是一组专为 AI Agent 设计的技能包，旨在提升 Agent 在**arXiv文献跟踪**，**中文学术写作**与**学术图表绘制**方面的专业性与规范性。
 
